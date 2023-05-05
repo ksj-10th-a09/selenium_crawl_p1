@@ -1,4 +1,5 @@
 import selenium
+import time
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 
@@ -26,6 +27,23 @@ driver.get(url=URL)
 
 # Wait until load
 driver.implicitly_wait(time_to_wait=10) # Implicit
+
+SCROLL_PAUSE_SEC = 1
+
+# Get Scroll Height
+last_height = driver.execute_script("return document.body.scrollHeight")
+
+while True:
+    # Scroll down to end
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(SCROLL_PAUSE_SEC)
+
+    # Get scroll height again after scroll down
+    new_height = driver.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height
+
 html_source = driver.page_source
 f=open("output.txt","w", encoding='utf-8')
 f.write(html_source)
