@@ -26,7 +26,7 @@ driver.get(url=URL)
 # driver.close()
 
 # Wait until load
-driver.implicitly_wait(time_to_wait=10) # Implicit
+driver.implicitly_wait(10) # Implicit
 
 SCROLL_PAUSE_SEC = 1
 
