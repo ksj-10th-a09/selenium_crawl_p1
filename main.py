@@ -3,10 +3,7 @@ import time
 import os
 from urllib.parse import urlparse
 
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.support.ui import WebDriverWait
-from bs4 import BeautifulSoup
+from selenium import webdriver
 
 URL = 'https://minnote.net'
 
@@ -15,12 +12,6 @@ options.add_argument('window-size=1920,1080')
 
 driver = webdriver.Edge(executable_path='msedgedriver', options=options)
 driver.get(url=URL)
-
-# Get URL
-# print(driver.current_url)
-
-# Close Driver
-# driver.close()
 
 # Wait until load
 driver.implicitly_wait(time_to_wait=10) # Implicit
