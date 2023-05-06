@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from selenium import webdriver
 
 URL = 'https://minnote.net'
+domain = urlparse(URL).netloc
 
 options = webdriver.EdgeOptions()
 options.add_argument('window-size=1920,1080')
@@ -33,6 +34,9 @@ while True:
     last_height = new_height
 
 html_source = driver.page_source
-f=open("output.txt","w", encoding='utf-8')
+title = driver.title
+
+os.mkdir("./" + domain)
+f=open("./" + domain + "/" + title + ".txt", "w", encoding='utf-8')
 f.write(html_source)
 f.close()
