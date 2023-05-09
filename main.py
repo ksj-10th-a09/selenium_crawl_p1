@@ -1,42 +1,25 @@
-import selenium
-import time
+import argparse
 import os
+from crawler import Crawler
 from urllib.parse import urlparse
 
-from selenium import webdriver
+# Parameter parsing
+parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
+parser.add_argument('--url', action='store', default='', help='분석을 원하는 사이트 주소를 입력해 주십시오.')
+parser.add_argument('--exclude', action='store', default='', help='URL에서 제외할 단어 혹은 패턴을 입력해 주십시오.')
 
-URL = 'https://minnote.net'
-domain = urlparse(URL).netloc
+# Init var
+args = parser.parse_args()
+url = args.url.rstrip("/")
+domain = urlparse(url).netloc
 
-options = webdriver.EdgeOptions()
-options.add_argument('window-size=1920,1080')
+# Make dir with domain name
+os.makedirs('./' + domain, exist_ok=True)
 
-driver = webdriver.Edge(executable_path='msedgedriver', options=options)
-driver.get(url=URL)
+crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
+links = crawler.start()
 
-# Wait until load
-driver.implicitly_wait(time_to_wait=10) # Implicit
-
-SCROLL_PAUSE_SEC = 1
-
-# Get Scroll Height
-last_height = driver.execute_script("return document.body.scrollHeight")
-
-while True:
-    # Scroll down to end
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(SCROLL_PAUSE_SEC)
-
-    # Get scroll height again after scroll down
-    new_height = driver.execute_script("return document.body.scrollHeight")
-    if new_height == last_height:
-        break
-    last_height = new_height
-
-html_source = driver.page_source
-title = driver.title
-
-os.mkdir("./" + domain)
-f=open("./" + domain + "/" + title + ".txt", "w", encoding='utf-8')
-f.write(html_source)
-f.close()
+# Write all url to text file
+with open('./' + domain + '/sitemap.txt', "w") as file:
+	for link in links:
+		file.write("{0}{1}\n".format(url, link))
