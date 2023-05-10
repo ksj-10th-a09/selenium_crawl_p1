@@ -13,10 +13,34 @@ def init(in_domain, in_browser='Edge'):
     domain = in_domain
     browser = in_browser
 
-# Wait until load
-driver.implicitly_wait(time_to_wait=10) # Implicit
+    if browser == 'Edge':
+        options = webdriver.EdgeOptions()
+        options.add_argument('window-size=1920,1080')
+        driver = webdriver.Edge(executable_path='msedgedriver', options=options)
 
-SCROLL_PAUSE_SEC = 1
+    elif browser == 'Chrome':
+        options = webdriver.ChromeOptions()
+        options.add_argument('window-size=1920,1080')
+        driver = webdriver.ChromeOptions(executetable_path='chromedriver', options=options)
+
+    else:
+        options = webdriver.EdgeOptions()
+        options.add_argument('window-size=1920,1080')
+        driver = webdriver.Edge(executable_path='msedgedriver', options=options)
+
+def start(in_url):
+    driver.get(url=in_url)
+
+    # Wait until load
+    driver.implicitly_wait(time_to_wait=10) # Implicit
+
+    # Get Scroll Height
+    last_height = driver.execute_script("return document.body.scrollHeight")
+
+    while True:
+        # Scroll down to end
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(SCROLL_PAUSE_SEC)
 
         # Get scroll height again after scroll down
         new_height = driver.execute_script("return document.body.scrollHeight")
