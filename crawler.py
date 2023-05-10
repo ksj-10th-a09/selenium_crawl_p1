@@ -25,7 +25,7 @@ class Crawler:
 		try:
 			response = urllib.request.urlopen(url)
 		except:
-			print('404 error')
+			print('404 error' + url)
 			return
 		
 		page = str(response.read())
