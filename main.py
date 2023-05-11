@@ -1,42 +1,38 @@
-import selenium
-import time
+import argparse
 import os
+import get_html
+from crawler import Crawler
 from urllib.parse import urlparse
 
-from selenium import webdriver
+global links
 
-URL = 'https://minnote.net'
-domain = urlparse(URL).netloc
+# Parameter parsing
+parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
+parser.add_argument('-u', '--url', action='store', default='', help='분석을 원하는 사이트 주소를 입력해 주십시오.', required=True)
+parser.add_argument('-e', '--exclude', action='store', default='', help='URL에서 제외할 단어 혹은 패턴을 입력해 주십시오.')
+parser.add_argument('-b', '--browser', action='store', default='Edge', help='사용할 브라우저를 선택 합니다')
 
-options = webdriver.EdgeOptions()
-options.add_argument('window-size=1920,1080')
+# Init var
+args = parser.parse_args()
+url = args.url.rstrip("/")
+domain = urlparse(url).netloc
 
-driver = webdriver.Edge(executable_path='msedgedriver', options=options)
-driver.get(url=URL)
+# Make dir with domain name
+path = './' + domain
+if not os.path.exists(path):
+	os.makedirs('./' + domain, exist_ok=True)
+	crawler = Crawler(url, exclude=args.exclude, no_verbose=True)
+	print('Please Wait for scan what target site...\nStart for ' + url)
+	links = crawler.start()
 
-# Wait until load
-driver.implicitly_wait(10) # Implicit
+	# Write all url to text file
+	with open('./' + domain + '/_sitemap_.txt', "w") as file:
+		for link in links:
+			file.write("{0}\n".format(link).lstrip('/'))
 
-SCROLL_PAUSE_SEC = 1
+f = open(path + '/_sitemap_.txt', 'r')
+links = f.readlines()
 
-# Get Scroll Height
-last_height = driver.execute_script("return document.body.scrollHeight")
-
-while True:
-    # Scroll down to end
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(SCROLL_PAUSE_SEC)
-
-    # Get scroll height again after scroll down
-    new_height = driver.execute_script("return document.body.scrollHeight")
-    if new_height == last_height:
-        break
-    last_height = new_height
-
-html_source = driver.page_source
-title = driver.title
-
-os.mkdir("./" + domain)
-f=open("./" + domain + "/" + title + ".txt", "w", encoding='utf-8')
-f.write(html_source)
-f.close()
+get_html.init(domain)
+for link in links:
+	get_html.start(url + '/' + link)
