@@ -33,7 +33,7 @@ def start(in_url):
     driver.get(url=in_url)
 
     # Wait until load
-    driver.implicitly_wait(time_to_wait=10) # Implicit
+    driver.implicitly_wait(time_to_wait=10)  # Implicit
 
     # Get Scroll Height
     last_height = driver.execute_script("return document.body.scrollHeight")
@@ -51,12 +51,14 @@ def start(in_url):
         last_height = new_height
 
     html_source = driver.page_source
+
+    # File write part
     try:
         file_name = in_url.replace('http://', '').replace('https://', '').replace('\n', '').replace('\\', '_') \
-            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_').replace('?', '_') \
-            .replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
+            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_') \
+            .replace('?', '_').replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
 
-        f=open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
+        f = open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
         f.write(html_source)
         f.close()
 
