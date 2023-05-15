@@ -1,9 +1,10 @@
 import time
 from selenium import webdriver
 
-SCROLL_PAUSE_SEC = 1
+SCROLL_PAUSE_SEC = 1    # Seconds for wait after scroll down
 
-def init(in_domain, in_browser='Edge'):
+
+def init(in_domain, in_browser='Edge'):  # Selenium browser init func
     global options
     global domain
     global browser
