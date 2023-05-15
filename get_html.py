@@ -1,10 +1,10 @@
 import time
-from urllib.parse import urlparse
 from selenium import webdriver
 
-SCROLL_PAUSE_SEC = 1
+SCROLL_PAUSE_SEC = 1    # Seconds for wait after scroll down
 
-def init(in_domain, in_browser='Edge'):
+
+def init(in_domain, in_browser='Edge'):  # Selenium browser init func
     global options
     global domain
     global browser
@@ -21,18 +21,19 @@ def init(in_domain, in_browser='Edge'):
     elif browser == 'Chrome':
         options = webdriver.ChromeOptions()
         options.add_argument('window-size=1920,1080')
-        driver = webdriver.ChromeOptions(executetable_path='chromedriver', options=options)
+        driver = webdriver.Chrome(executetable_path='chromedriver', options=options)
 
-    else:
-        options = webdriver.EdgeOptions()
+    elif browser == 'Firefox':
+        options = webdriver.FirefoxOptions()
         options.add_argument('window-size=1920,1080')
-        driver = webdriver.Edge(executable_path='msedgedriver', options=options)
+        driver = webdriver.Firefox(executetable_path='chromedriver', options=options)
+
 
 def start(in_url):
     driver.get(url=in_url)
 
     # Wait until load
-    driver.implicitly_wait(time_to_wait=10) # Implicit
+    driver.implicitly_wait(time_to_wait=10)  # Implicit
 
     # Get Scroll Height
     last_height = driver.execute_script("return document.body.scrollHeight")
@@ -50,12 +51,14 @@ def start(in_url):
         last_height = new_height
 
     html_source = driver.page_source
+
+    # File write part
     try:
         file_name = in_url.replace('http://', '').replace('https://', '').replace('\n', '').replace('\\', '_') \
-            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_').replace('?', '_')\
-            .replacec('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
+            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_') \
+            .replace('?', '_').replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
 
-        f=open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
+        f = open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
         f.write(html_source)
         f.close()
 
