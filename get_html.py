@@ -62,5 +62,8 @@ def start(in_url):
         f.write(html_source)
         f.close()
 
+    except FileNotFoundError as e:
+        print('Unsupported file name')
+
     except Exception as e:
         print(e)
