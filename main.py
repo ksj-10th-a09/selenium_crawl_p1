@@ -22,7 +22,6 @@ path = './' + domain
 if not os.path.exists(path):
 	os.makedirs('./' + domain, exist_ok=True)
 	crawler = Crawler(url, exclude=args.exclude, no_verbose=True)
-	print('Please Wait for scan what target site...\nStart for ' + url)
 	links = crawler.start()
 
 	# Write all url to text file
@@ -30,9 +29,15 @@ if not os.path.exists(path):
 		for link in links:
 			file.write("{0}\n".format(link).lstrip('/'))
 
-f = open(path + '/_sitemap_.txt', 'r')
-links = f.readlines()
+try:
+	f = open(path + '/_sitemap_.txt', 'r')
 
-get_html.init(domain)
-for link in links:
-	get_html.start(url + '/' + link)
+except FileNotFoundError:
+	print('ERROR: File Not Found')
+	
+else:
+	links = f.readlines()
+
+	get_html.init(domain)
+	for link in links:
+		get_html.start(url + '/' + link)
