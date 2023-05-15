@@ -52,8 +52,8 @@ def start(in_url):
     html_source = driver.page_source
     try:
         file_name = in_url.replace('http://', '').replace('https://', '').replace('\n', '').replace('\\', '_') \
-            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_').replace('?', '_')\
-            .replacec('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
+            .replace(domain, '').replace('/', '').replace(':', '-').replace('*', '_').replace('?', '_').replace('?', '_') \
+            .replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
 
         f=open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
         f.write(html_source)
