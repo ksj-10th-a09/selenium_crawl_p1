@@ -1,5 +1,4 @@
 import time
-from urllib.parse import urlparse
 from selenium import webdriver
 
 SCROLL_PAUSE_SEC = 1
