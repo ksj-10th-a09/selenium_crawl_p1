@@ -21,12 +21,13 @@ def init(in_domain, in_browser='Edge'):  # Selenium browser init func
     elif browser == 'Chrome':
         options = webdriver.ChromeOptions()
         options.add_argument('window-size=1920,1080')
-        driver = webdriver.ChromeOptions(executetable_path='chromedriver', options=options)
+        driver = webdriver.Chrome(executetable_path='chromedriver', options=options)
 
-    else:
-        options = webdriver.EdgeOptions()
+    elif browser == 'Firefox':
+        options = webdriver.FirefoxOptions()
         options.add_argument('window-size=1920,1080')
-        driver = webdriver.Edge(executable_path='msedgedriver', options=options)
+        driver = webdriver.Firefox(executetable_path='chromedriver', options=options)
+
 
 def start(in_url):
     driver.get(url=in_url)
