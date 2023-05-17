@@ -1,6 +1,7 @@
 import argparse
 import os
 import get_html
+import re
 from crawler import Crawler
 from urllib.parse import urlparse
 
@@ -24,20 +25,44 @@ if not os.path.exists(path):
 	crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
 	links = crawler.start()
 
-	# Write all url to text file
-	with open('./' + domain + '/_sitemap_.txt', "w") as file:
-		for link in links:
-			file.write("{0}\n".format(link).lstrip('/'))
+    crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
+    links = crawler.start()
 
+    # Write all url to text file
+    link_seen = set()
+    result = []
+
+    for link in links:
+        if link and link not in link_seen:
+            if not re.match(r'^https?://', link):
+                if args.tag == 'False':
+                    link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
+
+                if link != '' or link != ' ' or link != '\n':
+                    link = link.replace('%20', '/')
+                    link_seen.add(link)
+                    result.append(link)
+
+    try:
+        with open('./' + domain + '/_sitemap_.txt', "w") as file:
+            for link in result:
+                print('Saving ' + link.lstrip('/'), end='')
+                file.write(link.lstrip('/') + "\n")
+
+    except Exception as e:
+        print("Error: ", e)
+
+# try {
 try:
-	f = open(path + '/_sitemap_.txt', 'r')
+    f = open(path + '/_sitemap_.txt', 'r')
 
 except FileNotFoundError:
-	print('ERROR: File Not Found')
-	
-else:
-	links = f.readlines()
+    print('ERROR: File Not Found')
 
-	get_html.init(domain)
-	for link in links:
-		get_html.start(url + '/' + link)
+else:
+    links = f.readlines()
+
+    get_html.init(domain)
+    for link in links:
+        get_html.start(url + '/' + link)
+# }
