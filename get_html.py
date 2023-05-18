@@ -58,7 +58,7 @@ def start(in_url):
             .replace('/', '__').replace('"', '_').replace(domain, 'root')
 
         f = open("./" + domain + '/' + file_name + ".txt", "w", encoding='utf-8')
-        print('Saved ' + in_url)
+        print('Saved ' + in_url.strip())
         f.write(html_source)
         f.close()
 
