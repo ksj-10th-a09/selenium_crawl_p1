@@ -22,36 +22,40 @@ domain = urlparse(url).netloc
 # Make dir with domain name
 path = f'./{domain}'
 if not os.path.exists(path) or not os.path.exists(path + '/_sitemap_.txt'):
-    os.makedirs('./' + domain, exist_ok=True)
+    os.makedirs(path, exist_ok=True)
 
     crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
     links = crawler.start()
 
     # Write all url to text file
-    link_seen = set()
     result = []
 
     for link in links:
-        if link and link not in link_seen:
-            if not re.match(r'^https?://', link):
-                if args.tag == 'False':
-                    link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
-
-                if link != '' or link != ' ' or link != '\n':
-                    link = link.replace('%20', '/')
-                    link_seen.add(link)
-                    result.append(link)
+        if not re.match(r'^https?://', link):
+            if args.tag == 'False':
+                link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
+            result.append(link.strip())
 
     try:
-        with open('./' + domain + '/_sitemap_.txt', "w") as file:
+        with open(path + '/_parsing_.txt', "w") as file:
             for link in result:
-                print('Saving ' + link.lstrip('/'), end='')
-                file.write(link.lstrip('/') + "\n")
+                file.write(link.strip('/').strip() + '\n')
 
-    except Exception as e:
-        print("Error: ", e)
+    except IOError as e:
+        print('Error: ', e)
 
-# try {
+try:
+    with open(path + '/_parsing_.txt', 'r') as r, open(path + '/_sitemap_.txt', 'w') as o:
+        o.write('\n')
+        seen = set()
+        for line in r:
+            if line.strip():
+                if line not in seen:
+                    seen.add(line)
+                    o.write(line)
+except IOError as e:
+    print('Error: ', e)
+
 try:
     f = open(path + '/_sitemap_.txt', 'r')
 
@@ -64,4 +68,3 @@ else:
     get_html.init(domain)
     for link in links:
         get_html.start(url + '/' + link)
-# }
