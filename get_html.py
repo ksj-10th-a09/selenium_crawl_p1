@@ -26,7 +26,7 @@ def init(in_domain, in_browser='Edge'):  # Selenium browser init func
     elif browser == 'Firefox':
         options = webdriver.FirefoxOptions()
         options.add_argument('window-size=1920,1080')
-        driver = webdriver.Firefox(executetable_path='chromedriver', options=options)
+        driver = webdriver.Firefox(executetable_path='geckodriver', options=options)
 
 
 def start(in_url):
