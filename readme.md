@@ -8,6 +8,7 @@
 
 ## PIP modules
 - `selenium`
+- `BeautifulSoup`
 
 ## Reference
 - [www.selenium.dev/documentation/](https://www.selenium.dev/documentation/)
