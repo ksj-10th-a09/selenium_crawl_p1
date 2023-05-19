@@ -1,18 +1,17 @@
 import argparse
 import os
-import get_html
 import re
+import get_html
 from crawler import Crawler
 from urllib.parse import urlparse
 
-global links
-
 # Parameter parsing
 parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
-parser.add_argument('-u', '--url', action='store', default='', help='분석을 원하는 사이트 주소를 입력해 주십시오.', required=True)
-parser.add_argument('-e', '--exclude', action='store', default='', help='URL에서 제외할 단어 혹은 패턴을 입력해 주십시오.')
-parser.add_argument('-b', '--browser', action='store', default='Edge', help='사용할 브라우저를 선택 합니다')
-parser.add_argument('-t', '--tag', action='store', default='True', help='Tag를 검색합니다')
+parser.add_argument('-u', '--url', action='store', default='', help='분석을 원하는 사이트 주소', required=True)
+parser.add_argument('-e', '--exclude', action='store', default='', help='URL에서 제외할 단어 혹은 패턴')
+parser.add_argument('-b', '--browser', action='store', default='Edge', help='사용할 브라우저 선택 (Edge / Chrome / Firefox)')
+parser.add_argument('-t', '--tag', action='store', default='True', help='Tag 검색 유무 (True or False)')
+parser.add_argument('-c', '--cookie', action='store', default='', help='추키 여부 (쿠키1이름.쿠키1값,쿠키2이름.쿠키2값 ...')
 
 # Init var
 args = parser.parse_args()
@@ -20,51 +19,58 @@ url = args.url.rstrip("/")
 domain = urlparse(url).netloc
 
 # Make dir with domain name
-path = f'./{domain}'
-if not os.path.exists(path) or not os.path.exists(path + '/_sitemap_.txt'):
-    os.makedirs(path, exist_ok=True)
+directory_path = f'./{domain}'
+parsing_file_path = f'{directory_path}/_parsing_.txt'
+sitemap_file_path = f'{directory_path}/_sitemap_.txt'
 
-    crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
-    links = crawler.start()
+if not os.path.exists(directory_path) or not os.path.exists(sitemap_file_path):
+    os.makedirs(directory_path, exist_ok=True)
 
-    # Write all url to text file
-    result = []
+crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
+links = crawler.start()
 
-    for link in links:
-        if not re.match(r'^https?://', link):
-            if args.tag == 'False':
-                link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
-            result.append(link.strip())
+# Write all url to text file
+result = []
 
-    try:
-        with open(path + '/_parsing_.txt', "w") as file:
-            for link in result:
-                file.write(link.strip('/').strip() + '\n')
-
-    except IOError as e:
-        print('Error: ', e)
+for link in links:
+    if not re.match(r'^https?://', link):
+        if args.tag == 'False':
+            link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
+        result.append(link.strip())
 
 try:
-    with open(path + '/_parsing_.txt', 'r') as r, open(path + '/_sitemap_.txt', 'w') as o:
-        o.write('\n')
-        seen = set()
-        for line in r:
-            if line.strip():
-                if line not in seen:
-                    seen.add(line)
-                    o.write(line)
+    with open(parsing_file_path, "w") as file:
+        for link in result:
+            file.write(link.strip('/').strip() + '\n')
+
 except IOError as e:
     print('Error: ', e)
 
 try:
-    f = open(path + '/_sitemap_.txt', 'r')
+    with open(parsing_file_path, 'r') as r, open(sitemap_file_path, 'w') as o:
+        o.write('\n')
+        seen = set()
+        for line in r:
+            if line.strip() and line not in seen:
+                seen.add(line)
+                o.write(line)
+except IOError as e:
+    print('Error: ', e)
+
+try:
+    get_html.init(domain, args.browser)
+
+    if args.cookie != '':
+        bigList: list = args.cookie.split(',')
+        for i in range(0, int(len(bigList) / 2), 2):
+            get_html.addCookie(bigList[i].split('.')[0], bigList[i].split('.')[1])
+
+    with open(sitemap_file_path, 'r') as f:
+        links = f.readlines()
+
+        for link in links:
+            full_link = url + '/' + link
+            get_html.start(full_link)
 
 except FileNotFoundError:
     print('ERROR: File Not Found')
-
-else:
-    links = f.readlines()
-
-    get_html.init(domain)
-    for link in links:
-        get_html.start(url + '/' + link)
