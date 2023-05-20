@@ -3,6 +3,7 @@ import os
 
 import final_a_href_crawl
 import structured_data_save
+import sqli
 
 from urllib.parse import urlparse
 from selenium import webdriver
@@ -11,17 +12,29 @@ from selenium import webdriver
 parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
 parser.add_argument('-u', '--url', action='store', default='', help='분석을 원하는 사이트 주소', required=True)
 parser.add_argument('-b', '--browser', action='store', default='Edge', help='사용할 브라우저 선택 (Edge / Chrome / Firefox)')
+parser.add_argument('-t', '--thread', action='store', default='4', help='Thread 수 (1-10)')
 
 # Init var
 args = parser.parse_args()
 url = args.url.rstrip("/")
 domain = urlparse(url).netloc
 browser = args.browser
+thread = args.thread
+
+try:
+    if int(thread) < 1 or int(thread) > 11:
+        print('Error: thread option must be in range of 1, 10')
+        exit()
+
+except ValueError:
+    print('Error: thread option must be Int type, in range of 1,10')
+    exit()
 
 # Make dir with domain name
 directory_path = f'./{domain}'
 parsing_file_path = f'{directory_path}/_parsing_.txt'
 tag_file_path = f'{directory_path}/_tag_struct_.xlsx'
+injectable_file_path = f'{directory_path}/_injectable_.txt'
 
 # Make workdir
 os.makedirs(directory_path, exist_ok=True)
@@ -71,4 +84,11 @@ try:
 except Exception as e:
     print(f'Error: {e}')
 
-# TODO: Add Sqli test module
+# TODO: Complete Sqli test module
+try:
+    sql = sqli.init(url, thread)
+    out, injectable = sqli.process_run(sql)
+    result = sqli.result(out, injectable, injectable_file_path)
+
+except Exception as e:
+    print(f'Error: {e}')
