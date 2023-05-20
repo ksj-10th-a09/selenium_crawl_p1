@@ -45,23 +45,32 @@ driver_executables = {
 
 driver = webdriver.__getattribute__(browser)(executable_path=driver_executables.get(browser), options=options)
 
-# Crawling All Page
-try:
-    root_href = final_a_href_crawl.root_scan(url, driver)
-    final_a_href_crawl.save_to_file(root_href, directory_path, driver)
+dir = os.listdir(directory_path)
 
-except FileNotFoundError:
-    print('ERROR: File Not Found')
+# Skip if has already crawling data
+if len(dir) == 0:
+    # Crawling All Page
+    try:
+        a_tag = final_a_href_crawl.root_scan(url, driver)
+        href_list = final_a_href_crawl.recursive_scan(a_tag)
+        result = final_a_href_crawl.cleanup(href_list)
+        final_a_href_crawl.save_to_file(result, directory_path, driver)
 
-except IOError as e:
-    print('Error: ', e)
+    except FileNotFoundError:
+        print('Error: File Not Found')
+
+    except IOError as e:
+        print(f'Error: {e}')
 
 # Scan specific tag and export to xlsx
 try:
     txtf = structured_data_save.scan_txt(directory_path)
-    tags = structured_data_save.extract_tags_from_files(txtf)
-    structured_data_save.save_tags_to_excel(tags, tag_file_path)
+    tags, dict = structured_data_save.extract_tags_from_files(txtf)
+
+    print(dict)
+    structured_data_save.save_tags_to_excel(tags, dict, tag_file_path)
 
 except Exception as e:
-    print('Error: ', e)
+    print(f'Error: {e}')
 
+# TODO: Add Sqli test module
