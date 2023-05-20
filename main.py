@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import get_html
+import structured_data_save
 from crawler import Crawler
 from urllib.parse import urlparse
 
@@ -22,6 +23,7 @@ domain = urlparse(url).netloc
 directory_path = f'./{domain}'
 parsing_file_path = f'{directory_path}/_parsing_.txt'
 sitemap_file_path = f'{directory_path}/_sitemap_.txt'
+tag_file_path = f'{directory_path}/_tag_struct_.xlsx'
 
 if not os.path.exists(directory_path) or not os.path.exists(sitemap_file_path):
     os.makedirs(directory_path, exist_ok=True)
@@ -43,10 +45,6 @@ try:
         for link in result:
             file.write(link.strip('/').strip() + '\n')
 
-except IOError as e:
-    print('Error: ', e)
-
-try:
     with open(parsing_file_path, 'r') as r, open(sitemap_file_path, 'w') as o:
         o.write('\n')
         seen = set()
@@ -54,10 +52,8 @@ try:
             if line.strip() and line not in seen:
                 seen.add(line)
                 o.write(line)
-except IOError as e:
-    print('Error: ', e)
 
-try:
+# Get html source from txt file
     get_html.init(domain, args.browser)
 
     if args.cookie != '':
@@ -74,3 +70,16 @@ try:
 
 except FileNotFoundError:
     print('ERROR: File Not Found')
+
+except IOError as e:
+    print('Error: ', e)
+
+# Scan specific tag and export to xlsx
+try:
+    txtf = structured_data_save.scan_txt(directory_path)
+    tags = structured_data_save.extract_tags_from_files(txtf)
+    structured_data_save.save_tags_to_excel(tags, tag_file_path)
+
+except Exception as e:
+    print('Error: ', e)
+
