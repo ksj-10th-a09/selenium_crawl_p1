@@ -66,8 +66,6 @@ if len(dir) == 0:
 try:
     txtf = structured_data_save.scan_txt(directory_path)
     tags, dict = structured_data_save.extract_tags_from_files(txtf)
-
-    print(dict)
     structured_data_save.save_tags_to_excel(tags, dict, tag_file_path)
 
 except Exception as e:
