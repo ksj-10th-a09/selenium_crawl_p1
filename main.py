@@ -1,10 +1,11 @@
 import argparse
 import os
-import re
-import get_html
+
+import final_a_href_crawl
 import structured_data_save
-from crawler import Crawler
+
 from urllib.parse import urlparse
+from selenium import webdriver
 
 # Parameter parsing
 parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
@@ -18,55 +19,39 @@ parser.add_argument('-c', '--cookie', action='store', default='', help='추키 �
 args = parser.parse_args()
 url = args.url.rstrip("/")
 domain = urlparse(url).netloc
+browser = args.browser
 
 # Make dir with domain name
 directory_path = f'./{domain}'
 parsing_file_path = f'{directory_path}/_parsing_.txt'
-sitemap_file_path = f'{directory_path}/_sitemap_.txt'
 tag_file_path = f'{directory_path}/_tag_struct_.xlsx'
 
-if not os.path.exists(directory_path) or not os.path.exists(sitemap_file_path):
-    os.makedirs(directory_path, exist_ok=True)
+# Make workdir
+os.makedirs(directory_path, exist_ok=True)
 
-crawler = Crawler(url, exclude=args.exclude, no_verbose=False)
-links = crawler.start()
+# Init Browser
+driver_options = {
+    'Edge': webdriver.EdgeOptions(),
+    'Chrome': webdriver.ChromeOptions(),
+    'Firefox': webdriver.FirefoxOptions()
+}
 
-# Write all url to text file
-result = []
+options = driver_options.get(browser)
+options.add_argument('window-size=1920,1080')
+options.add_argument('--headless')  # Run Chrome in headless mode (without opening a browser window)
 
-for link in links:
-    if not re.match(r'^https?://', link):
-        if args.tag == 'False':
-            link = re.sub(r'(?:tags?|tag|#.*$)', '', link)
-        result.append(link.strip())
+driver_executables = {
+    'Edge': './msedgedriver.exe',
+    'Chrome': './chromedriver.exe',
+    'Firefox': './geckodriver.exe'
+}
 
+driver = webdriver.__getattribute__(browser)(executable_path=driver_executables.get(browser), options=options)
+
+# Crawling All Page
 try:
-    with open(parsing_file_path, "w") as file:
-        for link in result:
-            file.write(link.strip('/').strip() + '\n')
-
-    with open(parsing_file_path, 'r') as r, open(sitemap_file_path, 'w') as o:
-        o.write('\n')
-        seen = set()
-        for line in r:
-            if line.strip() and line not in seen:
-                seen.add(line)
-                o.write(line)
-
-# Get html source from txt file
-    get_html.init(domain, args.browser)
-
-    if args.cookie != '':
-        bigList: list = args.cookie.split(',')
-        for i in range(0, int(len(bigList) / 2), 2):
-            get_html.addCookie(bigList[i].split('.')[0], bigList[i].split('.')[1])
-
-    with open(sitemap_file_path, 'r') as f:
-        links = f.readlines()
-
-        for link in links:
-            full_link = url + '/' + link
-            get_html.start(full_link)
+    root_href = final_a_href_crawl.root_scan(url, driver)
+    final_a_href_crawl.save_to_file(root_href, directory_path, driver)
 
 except FileNotFoundError:
     print('ERROR: File Not Found')
