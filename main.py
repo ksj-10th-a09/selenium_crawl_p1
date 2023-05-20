@@ -10,10 +10,7 @@ from selenium import webdriver
 # Parameter parsing
 parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
 parser.add_argument('-u', '--url', action='store', default='', help='분석을 원하는 사이트 주소', required=True)
-parser.add_argument('-e', '--exclude', action='store', default='', help='URL에서 제외할 단어 혹은 패턴')
 parser.add_argument('-b', '--browser', action='store', default='Edge', help='사용할 브라우저 선택 (Edge / Chrome / Firefox)')
-parser.add_argument('-t', '--tag', action='store', default='True', help='Tag 검색 유무 (True or False)')
-parser.add_argument('-c', '--cookie', action='store', default='', help='추키 여부 (쿠키1이름.쿠키1값,쿠키2이름.쿠키2값 ...')
 
 # Init var
 args = parser.parse_args()
