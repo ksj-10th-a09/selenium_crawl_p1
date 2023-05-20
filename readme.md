@@ -14,6 +14,7 @@
 - `selenium`
 - `BeautifulSoup`
 - `pandas`
+- `openpyxl`
 
 ## Micro-module
 - `final_a_href_crawl.py`: Web Crawling Part
@@ -24,7 +25,7 @@
 > K-Shield Jr. 10th A-09
 
 ### Crew
-- **이호민** (Web Crawling Dev, Integration Dev, GUI Dev)
+- **이호민** (Integration Dev, GUI Dev)
 - **김태현** (Data Structured Dev)
 - **박지은** (Web Crawling Dev)
 - **이승훈** (SQL Injectable Test Dev)
