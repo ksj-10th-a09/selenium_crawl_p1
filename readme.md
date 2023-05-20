@@ -21,11 +21,14 @@
 - `structured_data_save.py`: Data Structured Part
 - `.py`: SQL Injectable Test Part
 
+## Graphic User Interface
+[Selenium GUI Project](https://github.com/ksj-10th-a09/sqli-detection-gui)
+
 ## About Team
 > K-Shield Jr. 10th A-09
 
 ### Crew
-- **이호민** (Integration Dev, GUI Dev)
+- **이호민** (Project Manager, Integration / GUI Dev)
 - **김태현** (Data Structured Dev)
 - **박지은** (Web Crawling Dev)
 - **이승훈** (SQL Injectable Test Dev)
