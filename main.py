@@ -1,12 +1,12 @@
 import argparse
 import os
+import sys
+import subprocess
 
 import final_a_href_crawl
 import structured_data_save
-import sqli
 
 from urllib.parse import urlparse
-from selenium import webdriver
 
 # Parameter parsing
 parser = argparse.ArgumentParser(description="K-Shield Jr. 10th Python Crawling Project")
@@ -30,6 +30,24 @@ except ValueError:
     print('Error: thread option must be Int type, in range of 1,10')
     exit()
 
+# Check pip module installed
+while True:
+    try:
+        import bs4
+        import selenium
+        import pandas
+        import openpyxl
+
+    except ModuleNotFoundError as e:
+        print('Error: Dependency module not found. Try to installing')
+        subprocess.call(['python', '-m', 'pip', '--disable-pip-version-check', 'install', 'BeautifulSoup4'])
+        subprocess.call(['python', '-m', 'pip', '--disable-pip-version-check', 'install', 'pandas'])
+        subprocess.call(['python', '-m', 'pip', '--disable-pip-version-check', 'install', 'openpyxl'])
+        subprocess.call(['python', '-m', 'pip', '--disable-pip-version-check', 'install', 'selenium'])
+
+    else:
+        break
+
 # Make dir with domain name
 directory_path = f'./{domain}'
 parsing_file_path = f'{directory_path}/_parsing_.txt'
@@ -39,6 +57,7 @@ injectable_file_path = f'{directory_path}/_injectable_.txt'
 # Make workdir
 os.makedirs(directory_path, exist_ok=True)
 
+from selenium import webdriver
 # Init Browser
 driver_options = {
     'Edge': webdriver.EdgeOptions(),
@@ -48,7 +67,7 @@ driver_options = {
 
 options = driver_options.get(browser)
 options.add_argument('window-size=1920,1080')
-options.add_argument('--headless')  # Run Chrome in headless mode (without opening a browser window)
+options.add_argument('--headless')  # Run webdriver in headless mode (without opening a browser window)
 
 driver_executables = {
     'Edge': './msedgedriver.exe',
