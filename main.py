@@ -85,10 +85,12 @@ except Exception as e:
     print(f'Error: {e}')
 
 # TODO: Complete Sqli test module
-try:
-    sql = sqli.init(url, thread)
-    out, injectable = sqli.process_run(sql)
-    result = sqli.result(out, injectable, injectable_file_path)
-
-except Exception as e:
-    print(f'Error: {e}')
+# try:
+#     sql = sqli.init(url, thread)
+#     out, injectable = sqli.process_run(sql)
+#     result = sqli.result(out, injectable, injectable_file_path)
+#
+#     print()
+#
+# except Exception as e:
+#     print(f'Error: {e}')
